@@ -1,0 +1,36 @@
+{
+  "name": "unzip-response",
+  "version": "0.0.0",
+  "description": "Unzip a HTTP response if needed",
+  "license": "MIT",
+  "repository": "sindresorhus/unzip-response",
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "http",
+    "unzip",
+    "zlib",
+    "gzip",
+    "deflate",
+    "incoming",
+    "message",
+    "response",
+    "stream"
+  ],
+  "devDependencies": {
+    "concat-stream": "^1.5.0",
+    "tape": "^4.0.0"
+  }
+}
