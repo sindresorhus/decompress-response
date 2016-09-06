@@ -29,7 +29,7 @@ module.exports = res => {
 
 		res.pipe(unzip).pipe(stream);
 
-		res = stream;
+		return stream;
 	}
 
 	return res;
