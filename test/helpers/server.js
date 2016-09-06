@@ -1,5 +1,6 @@
 'use strict';
 const http = require('http');
+const pify = require('pify');
 
 exports.host = 'localhost';
 exports.port = 6765;
@@ -17,6 +18,9 @@ exports.createServer = port => {
 	s.port = port;
 	s.url = `http://${host}:${port}`;
 	s.protocol = 'http';
+
+	s.listen = pify(s.listen);
+	s.close = pify(s.close);
 
 	return s;
 };
