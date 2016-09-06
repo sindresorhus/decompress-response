@@ -20,7 +20,7 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "tape && xo"
+    "test": "tape test/test.js && xo"
   },
   "files": [
     "index.js"
