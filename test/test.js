@@ -21,6 +21,19 @@ s.on('/', function (req, res) {
 	});
 });
 
+s.on('/missing-data', function (req, res) {
+	res.statusCode = 200;
+	res.setHeader('Content-Type', 'text/plain');
+	res.setHeader('Content-Encoding', 'gzip');
+	zlib.gzip(fixture, function (err, data) {
+		if (err) {
+			throw err;
+		}
+
+		res.end(data.slice(0, -1));
+	});
+});
+
 test('setup', function (t) {
 	s.listen(s.port, function () {
 		t.end();
@@ -29,6 +42,22 @@ test('setup', function (t) {
 
 test('unzip content', function (t) {
 	http.get(s.url, function (res) {
+		res = fn(res);
+
+		t.ok(typeof res.httpVersion === 'string');
+		t.ok(res.headers);
+
+		res.setEncoding('utf8');
+
+		res.pipe(concatStream(function (data) {
+			t.equal(data, fixture);
+			t.end();
+		}));
+	}).on('err', t.error.bind(t));
+});
+
+test('ignore missing data', function (t) {
+	http.get(s.url + '/missing-data', function (res) {
 		res = fn(res);
 
 		t.ok(typeof res.httpVersion === 'string');
