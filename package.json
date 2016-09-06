@@ -17,10 +17,10 @@
     }
   ],
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4"
   },
   "scripts": {
-    "test": "node test/test.js"
+    "test": "tape && xo"
   },
   "files": [
     "index.js"
@@ -37,7 +37,8 @@
     "stream"
   ],
   "devDependencies": {
-    "concat-stream": "^1.5.0",
-    "tape": "^4.0.0"
+    "get-stream": "^2.3.0",
+    "tape": "^4.0.0",
+    "xo": "*"
   }
 }

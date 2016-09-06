@@ -2,7 +2,7 @@
 
 > Unzip a HTTP response if needed
 
-Unzips the response from `http.request` if it's gzipped/deflated, otherwise just passes it through.
+Unzips the response from [`http.request`](https://nodejs.org/api/http.html#http_http_request_options_callback) if it's gzipped/deflated, otherwise just passes it through.
 
 
 ## Install
@@ -15,10 +15,10 @@ $ npm install --save unzip-response
 ## Usage
 
 ```js
-var http = require('http');
-var unzipResponse = require('unzip-response');
+const http = require('http');
+const unzipResponse = require('unzip-response');
 
-http.get('http://sindresorhus.com', function (res) {
+http.get('http://sindresorhus.com', res => {
 	res = unzipResponse(res);
 });
 ```
@@ -26,4 +26,4 @@ http.get('http://sindresorhus.com', function (res) {
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+MIT © [Sindre Sorhus](https://sindresorhus.com)

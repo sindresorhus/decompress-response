@@ -1,9 +1,10 @@
 'use strict';
-var zlib = require('zlib');
+const zlib = require('zlib');
 
-module.exports = function (res) {
+module.exports = res => {
+	// TODO: use Array#includes when targeting Node.js 6
 	if (['gzip', 'deflate'].indexOf(res.headers['content-encoding']) !== -1) {
-		var unzip = zlib.createUnzip();
+		const unzip = zlib.createUnzip();
 
 		unzip.httpVersion = res.httpVersion;
 		unzip.headers = res.headers;
@@ -15,7 +16,7 @@ module.exports = function (res) {
 		unzip.statusMessage = res.statusMessage;
 		unzip.socket = res.socket;
 
-		unzip.once('error', function (err) {
+		unzip.once('error', err => {
 			if (err.code === 'Z_BUF_ERROR') {
 				res.emit('end');
 				return;
@@ -24,7 +25,7 @@ module.exports = function (res) {
 			res.emit('error', err);
 		});
 
-		res.on('close', function () {
+		res.on('close', () => {
 			unzip.emit('close');
 		});
 

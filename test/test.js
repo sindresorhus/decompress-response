@@ -1,18 +1,19 @@
 'use strict';
-var http = require('http');
-var zlib = require('zlib');
-var test = require('tape');
-var concatStream = require('concat-stream');
-var fn = require('../');
-var server = require('./server.js');
-var s = server.createServer();
-var fixture = 'Compressible response content.\n';
+const http = require('http');
+const zlib = require('zlib');
+const test = require('tape');
+const getStream = require('get-stream');
+const fn = require('../');
+const server = require('./server.js');
 
-s.on('/', function (req, res) {
+const s = server.createServer();
+const fixture = 'Compressible response content.\n';
+
+s.on('/', (req, res) => {
 	res.statusCode = 200;
 	res.setHeader('Content-Type', 'text/plain');
 	res.setHeader('Content-Encoding', 'gzip');
-	zlib.gzip(fixture, function (err, data) {
+	zlib.gzip(fixture, (err, data) => {
 		if (err) {
 			throw err;
 		}
@@ -21,11 +22,11 @@ s.on('/', function (req, res) {
 	});
 });
 
-s.on('/missing-data', function (req, res) {
+s.on('/missing-data', (req, res) => {
 	res.statusCode = 200;
 	res.setHeader('Content-Type', 'text/plain');
 	res.setHeader('Content-Encoding', 'gzip');
-	zlib.gzip(fixture, function (err, data) {
+	zlib.gzip(fixture, (err, data) => {
 		if (err) {
 			throw err;
 		}
@@ -34,14 +35,14 @@ s.on('/missing-data', function (req, res) {
 	});
 });
 
-test('setup', function (t) {
-	s.listen(s.port, function () {
+test('setup', t => {
+	s.listen(s.port, () => {
 		t.end();
 	});
 });
 
-test('unzip content', function (t) {
-	http.get(s.url, function (res) {
+test('unzip content', t => {
+	http.get(s.url, res => {
 		res = fn(res);
 
 		t.ok(typeof res.httpVersion === 'string');
@@ -49,15 +50,15 @@ test('unzip content', function (t) {
 
 		res.setEncoding('utf8');
 
-		res.pipe(concatStream(function (data) {
+		getStream(res).then(data => {
 			t.equal(data, fixture);
 			t.end();
-		}));
+		});
 	}).on('err', t.error.bind(t));
 });
 
-test('ignore missing data', function (t) {
-	http.get(s.url + '/missing-data', function (res) {
+test('ignore missing data', t => {
+	http.get(`${s.url}/missing-data`, res => {
 		res = fn(res);
 
 		t.ok(typeof res.httpVersion === 'string');
@@ -65,14 +66,14 @@ test('ignore missing data', function (t) {
 
 		res.setEncoding('utf8');
 
-		res.pipe(concatStream(function (data) {
+		getStream(res).then(data => {
 			t.equal(data, fixture);
 			t.end();
-		}));
+		});
 	}).on('err', t.error.bind(t));
 });
 
-test('cleanup', function (t) {
+test('cleanup', t => {
 	s.close();
 	t.end();
 });
