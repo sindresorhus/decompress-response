@@ -1,79 +1,60 @@
-'use strict';
-const http = require('http');
-const zlib = require('zlib');
-const test = require('tape');
-const getStream = require('get-stream');
-const fn = require('../');
-const server = require('./server.js');
+import http from 'http';
+import zlib from 'zlib';
+import test from 'ava';
+import getStream from 'get-stream';
+import pify from 'pify';
+import rfpify from 'rfpify';
+import m from '../';
+import {createServer} from './helpers/server.js';
 
-const s = server.createServer();
+const gzipP = pify(zlib.gzip);
+const httpGetP = rfpify(http.get);
 const fixture = 'Compressible response content.\n';
 
-s.on('/', (req, res) => {
-	res.statusCode = 200;
-	res.setHeader('Content-Type', 'text/plain');
-	res.setHeader('Content-Encoding', 'gzip');
-	zlib.gzip(fixture, (err, data) => {
-		if (err) {
-			throw err;
-		}
+let s;
 
-		res.end(data);
+test.before('setup', async () => {
+	s = createServer();
+
+	s.on('/', async (req, res) => {
+		res.statusCode = 200;
+		res.setHeader('Content-Type', 'text/plain');
+		res.setHeader('Content-Encoding', 'gzip');
+		res.end(await gzipP(fixture));
 	});
-});
 
-s.on('/missing-data', (req, res) => {
-	res.statusCode = 200;
-	res.setHeader('Content-Type', 'text/plain');
-	res.setHeader('Content-Encoding', 'gzip');
-	zlib.gzip(fixture, (err, data) => {
-		if (err) {
-			throw err;
-		}
-
-		res.end(data.slice(0, -1));
+	s.on('/missing-data', async (req, res) => {
+		res.statusCode = 200;
+		res.setHeader('Content-Encodingnt-Type', 'text/plain');
+		res.setHeader('Content-Encoding', 'gzip');
+		res.end((await gzipP(fixture)).slice(0, -1));
 	});
+
+	await s.listen(s.port);
 });
 
-test('setup', t => {
-	s.listen(s.port, () => {
-		t.end();
-	});
+test('unzip content', async t => {
+	const res = m(await httpGetP(s.url));
+
+	t.is(typeof res.httpVersion, 'string');
+	t.truthy(res.headers);
+
+	res.setEncoding('utf8');
+
+	t.is(await getStream(res), fixture);
 });
 
-test('unzip content', t => {
-	http.get(s.url, res => {
-		res = fn(res);
+test('ignore missing data', async t => {
+	const res = m(await httpGetP(`${s.url}/missing-data`));
 
-		t.ok(typeof res.httpVersion === 'string');
-		t.ok(res.headers);
+	t.is(typeof res.httpVersion, 'string');
+	t.truthy(res.headers);
 
-		res.setEncoding('utf8');
+	res.setEncoding('utf8');
 
-		getStream(res).then(data => {
-			t.equal(data, fixture);
-			t.end();
-		});
-	}).on('err', t.error.bind(t));
+	t.is(await getStream(res), fixture);
 });
 
-test('ignore missing data', t => {
-	http.get(`${s.url}/missing-data`, res => {
-		res = fn(res);
-
-		t.ok(typeof res.httpVersion === 'string');
-		t.ok(res.headers);
-
-		res.setEncoding('utf8');
-
-		getStream(res).then(data => {
-			t.equal(data, fixture);
-			t.end();
-		});
-	}).on('err', t.error.bind(t));
-});
-
-test('cleanup', t => {
-	s.close();
-	t.end();
+test.after('cleanup', async () => {
+	await s.close();
 });

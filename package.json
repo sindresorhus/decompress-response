@@ -20,7 +20,7 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "tape test/test.js && xo"
+    "test": "xo && ava"
   },
   "files": [
     "index.js"
@@ -37,8 +37,13 @@
     "stream"
   ],
   "devDependencies": {
+    "ava": "*",
     "get-stream": "^2.3.0",
-    "tape": "^4.0.0",
+    "pify": "^2.3.0",
+    "rfpify": "^1.0.0",
     "xo": "*"
+  },
+  "xo": {
+    "esnext": true
   }
 }
