@@ -1,15 +1,15 @@
 'use strict';
-const PassThrough = require('stream').PassThrough;
-const zlib = require('zlib');
+var PassThrough = require('stream').PassThrough;
+var zlib = require('zlib');
 
-module.exports = res => {
+module.exports = function (res) {
 	// TODO: use Array#includes when targeting Node.js 6
 	if (['gzip', 'deflate'].indexOf(res.headers['content-encoding']) === -1) {
 		return res;
 	}
 
-	const unzip = zlib.createUnzip();
-	const stream = new PassThrough();
+	var unzip = zlib.createUnzip();
+	var stream = new PassThrough();
 
 	stream.httpVersion = res.httpVersion;
 	stream.headers = res.headers;
@@ -21,7 +21,7 @@ module.exports = res => {
 	stream.statusMessage = res.statusMessage;
 	stream.socket = res.socket;
 
-	unzip.on('error', err => {
+	unzip.on('error', function (err) {
 		if (err.code === 'Z_BUF_ERROR') {
 			stream.end();
 			return;

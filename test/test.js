@@ -4,11 +4,12 @@ import test from 'ava';
 import getStream from 'get-stream';
 import pify from 'pify';
 import rfpify from 'rfpify';
+import Promise from 'pinkie-promise';
 import m from '../';
 import {createServer} from './helpers/server.js';
 
-const zlibP = pify(zlib);
-const httpGetP = rfpify(http.get);
+const zlibP = pify(zlib, Promise);
+const httpGetP = rfpify(http.get, Promise);
 const fixture = 'Compressible response content.\n';
 
 let s;
