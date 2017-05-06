@@ -4,8 +4,8 @@ import test from 'ava';
 import getStream from 'get-stream';
 import pify from 'pify';
 import rfpify from 'rfpify';
-import m from '../';
-import {createServer} from './helpers/server.js';
+import m from '..';
+import {createServer} from './helpers/server';
 
 const zlibP = pify(zlib);
 const httpGetP = rfpify(http.get);
@@ -18,29 +18,33 @@ test.before('setup', async () => {
 
 	s.on('/', async (req, res) => {
 		res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/plain');
-		res.setHeader('Content-Encoding', 'gzip');
+		res.setHeader('content-type', 'text/plain');
+		res.setHeader('content-encoding', 'gzip');
 		res.end(await zlibP.gzip(fixture));
 	});
 
 	s.on('/deflate', async (req, res) => {
 		res.statusCode = 200;
-		res.setHeader('Content-Encodingnt-Type', 'text/plain');
-		res.setHeader('Content-Encoding', 'deflate');
+		res.setHeader('content-encoding-type', 'text/plain');
+		res.setHeader('content-encoding', 'deflate');
 		res.end(await zlibP.deflate(fixture));
 	});
 
 	s.on('/missing-data', async (req, res) => {
 		res.statusCode = 200;
-		res.setHeader('Content-Encodingnt-Type', 'text/plain');
-		res.setHeader('Content-Encoding', 'gzip');
+		res.setHeader('content-encoding-type', 'text/plain');
+		res.setHeader('content-encoding', 'gzip');
 		res.end((await zlibP.gzip(fixture)).slice(0, -1));
 	});
 
 	await s.listen(s.port);
 });
 
-test('unzip gzipped content', async t => {
+test.after('cleanup', async () => {
+	await s.close();
+});
+
+test('decompress gzipped content', async t => {
 	const res = m(await httpGetP(s.url));
 
 	t.is(typeof res.httpVersion, 'string');
@@ -51,7 +55,7 @@ test('unzip gzipped content', async t => {
 	t.is(await getStream(res), fixture);
 });
 
-test('unzip deflated content', async t => {
+test('decompress deflated content', async t => {
 	const res = m(await httpGetP(`${s.url}/deflate`));
 
 	t.is(typeof res.httpVersion, 'string');
@@ -71,8 +75,4 @@ test('ignore missing data', async t => {
 	res.setEncoding('utf8');
 
 	t.is(await getStream(res), fixture);
-});
-
-test.after('cleanup', async () => {
-	await s.close();
 });

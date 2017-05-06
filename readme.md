@@ -1,14 +1,14 @@
-# unzip-response [![Build Status](https://travis-ci.org/sindresorhus/unzip-response.svg?branch=master)](https://travis-ci.org/sindresorhus/unzip-response)
+# decompress-response [![Build Status](https://travis-ci.org/sindresorhus/decompress-response.svg?branch=master)](https://travis-ci.org/sindresorhus/decompress-response)
 
-> Unzip a HTTP response if needed
+> Decompress a HTTP response if needed
 
-Unzips the response from [`http.request`](https://nodejs.org/api/http.html#http_http_request_options_callback) if it's gzipped/deflated, otherwise just passes it through.
+Decompresses the [response](https://nodejs.org/api/http.html#http_class_http_incomingmessage) from [`http.request`](https://nodejs.org/api/http.html#http_http_request_options_callback) if it's gzipped or deflated, otherwise just passes it through.
 
 
 ## Install
 
 ```
-$ npm install --save unzip-response
+$ npm install decompress-response
 ```
 
 
@@ -16,10 +16,10 @@ $ npm install --save unzip-response
 
 ```js
 const http = require('http');
-const unzipResponse = require('unzip-response');
+const decompressResponse = require('decompress-response');
 
-http.get('http://sindresorhus.com', res => {
-	res = unzipResponse(res);
+http.get('http://sindresorhus.com', response => {
+	response = decompressResponse(response);
 });
 ```
 

@@ -3,7 +3,7 @@ const PassThrough = require('stream').PassThrough;
 const zlib = require('zlib');
 
 module.exports = res => {
-	// TODO: use Array#includes when targeting Node.js 6
+	// TODO: Use Array#includes when targeting Node.js 6
 	if (['gzip', 'deflate'].indexOf(res.headers['content-encoding']) === -1) {
 		return res;
 	}
@@ -11,15 +11,17 @@ module.exports = res => {
 	const unzip = zlib.createUnzip();
 	const stream = new PassThrough();
 
-	stream.httpVersion = res.httpVersion;
-	stream.headers = res.headers;
-	stream.rawHeaders = res.rawHeaders;
-	stream.trailers = res.trailers;
-	stream.rawTrailers = res.rawTrailers;
+	// https://nodejs.org/api/http.html#http_class_http_incomingmessage
+	stream.destroy = res.destroy.bind(res);
 	stream.setTimeout = res.setTimeout.bind(res);
-	stream.statusCode = res.statusCode;
-	stream.statusMessage = res.statusMessage;
 	stream.socket = res.socket;
+	stream.headers = res.headers;
+	stream.trailers = res.trailers;
+	stream.rawHeaders = res.rawHeaders;
+	stream.statusCode = res.statusCode;
+	stream.httpVersion = res.httpVersion;
+	stream.rawTrailers = res.rawTrailers;
+	stream.statusMessage = res.statusMessage;
 
 	unzip.on('error', err => {
 		if (err.code === 'Z_BUF_ERROR') {

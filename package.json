@@ -1,9 +1,9 @@
 {
-  "name": "unzip-response",
+  "name": "decompress-response",
   "version": "3.0.0",
-  "description": "Unzip a HTTP response if needed",
+  "description": "Decompress a HTTP response if needed",
   "license": "MIT",
-  "repository": "sindresorhus/unzip-response",
+  "repository": "sindresorhus/decompress-response",
   "maintainers": [
     {
       "name": "Sindre Sorhus",
@@ -26,24 +26,26 @@
     "index.js"
   ],
   "keywords": [
+    "decompress",
+    "response",
     "http",
-    "unzip",
+    "https",
     "zlib",
     "gzip",
+    "zip",
     "deflate",
+    "unzip",
+    "ungzip",
     "incoming",
     "message",
-    "response",
-    "stream"
+    "stream",
+    "compressed"
   ],
   "devDependencies": {
     "ava": "*",
-    "get-stream": "^2.3.0",
+    "get-stream": "^3.0.0",
     "pify": "^2.3.0",
     "rfpify": "^1.0.0",
     "xo": "*"
-  },
-  "xo": {
-    "esnext": true
   }
 }
