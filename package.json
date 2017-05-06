@@ -1,6 +1,6 @@
 {
   "name": "unzip-response",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Unzip a HTTP response if needed",
   "license": "MIT",
   "repository": "sindresorhus/unzip-response",
