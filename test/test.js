@@ -47,8 +47,18 @@ test.after('cleanup', async () => {
 test('decompress gzipped content', async t => {
 	const res = m(await httpGetP(s.url));
 
-	t.is(typeof res.httpVersion, 'string');
+	t.truthy(res.destroy);
+	t.truthy(res.setTimeout);
+	t.truthy(res.socket);
 	t.truthy(res.headers);
+	t.truthy(res.trailers);
+	t.truthy(res.rawHeaders);
+	t.truthy(res.statusCode);
+	t.truthy(res.httpVersion);
+	t.truthy(res.httpVersionMinor);
+	t.truthy(res.httpVersionMajor);
+	t.truthy(res.rawTrailers);
+	t.truthy(res.statusMessage);
 
 	res.setEncoding('utf8');
 
@@ -75,4 +85,14 @@ test('ignore missing data', async t => {
 	res.setEncoding('utf8');
 
 	t.is(await getStream(res), fixture);
+});
+
+test('preserves custom properties on the stream', async t => {
+	let res = await httpGetP(s.url);
+	res.customProp = '🦄';
+	res = m(res);
+
+	t.is(res.customProp, '🦄');
+
+	res.destroy();
 });
