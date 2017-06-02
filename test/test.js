@@ -3,12 +3,11 @@ import zlib from 'zlib';
 import test from 'ava';
 import getStream from 'get-stream';
 import pify from 'pify';
-import rfpify from 'rfpify';
 import m from '..';
 import {createServer} from './helpers/server';
 
 const zlibP = pify(zlib);
-const httpGetP = rfpify(http.get);
+const httpGetP = pify(http.get, {errorFirst: false});
 const fixture = 'Compressible response content.\n';
 
 let s;

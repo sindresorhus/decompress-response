@@ -47,8 +47,7 @@
   "devDependencies": {
     "ava": "*",
     "get-stream": "^3.0.0",
-    "pify": "^2.3.0",
-    "rfpify": "^1.0.0",
+    "pify": "^3.0.0",
     "xo": "*"
   }
 }
