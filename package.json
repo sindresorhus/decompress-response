@@ -41,6 +41,9 @@
     "stream",
     "compressed"
   ],
+  "dependencies": {
+    "mimic-response": "^1.0.0"
+  },
   "devDependencies": {
     "ava": "*",
     "get-stream": "^3.0.0",
