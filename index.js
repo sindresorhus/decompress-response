@@ -30,7 +30,7 @@ const copyProps = (fromStream, toStream) => {
 			continue;
 		}
 
-		toStream[prop] = typeof prop === 'function' ? fromStream[prop].bind(fromStream) : fromStream[prop];
+		toStream[prop] = typeof fromStream[prop] === 'function' ? fromStream[prop].bind(fromStream) : fromStream[prop];
 	}
 };
 
