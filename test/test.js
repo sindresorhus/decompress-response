@@ -3,10 +3,12 @@ import zlib from 'zlib';
 import test from 'ava';
 import getStream from 'get-stream';
 import pify from 'pify';
+import iltorb from 'iltorb';
 import m from '..';
 import {createServer} from './helpers/server';
 
 const zlibP = pify(zlib);
+const iltorbP = pify(iltorb);
 const httpGetP = pify(http.get, {errorFirst: false});
 const fixture = 'Compressible response content.\n';
 
@@ -27,6 +29,13 @@ test.before('setup', async () => {
 		res.setHeader('content-encoding-type', 'text/plain');
 		res.setHeader('content-encoding', 'deflate');
 		res.end(await zlibP.deflate(fixture));
+	});
+
+	s.on('/brotli', async (req, res) => {
+		res.statusCode = 200;
+		res.setHeader('content-encoding-type', 'text/plain');
+		res.setHeader('content-encoding', 'br');
+		res.end(await iltorbP.compress(Buffer.from(fixture)));
 	});
 
 	s.on('/missing-data', async (req, res) => {
@@ -66,6 +75,17 @@ test('decompress gzipped content', async t => {
 
 test('decompress deflated content', async t => {
 	const res = m(await httpGetP(`${s.url}/deflate`));
+
+	t.is(typeof res.httpVersion, 'string');
+	t.truthy(res.headers);
+
+	res.setEncoding('utf8');
+
+	t.is(await getStream(res), fixture);
+});
+
+test('decompress brotli content', async t => {
+	const res = m(await httpGetP(`${s.url}/brotli`));
 
 	t.is(typeof res.httpVersion, 'string');
 	t.truthy(res.headers);
