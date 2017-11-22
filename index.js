@@ -15,6 +15,7 @@ module.exports = response => {
 	mimicResponse(response, stream);
 
 	unzip.on('error', err => {
+		// Ignore empty response
 		if (err.code === 'Z_BUF_ERROR') {
 			stream.end();
 			return;
