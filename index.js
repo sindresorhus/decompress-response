@@ -1,7 +1,7 @@
 'use strict';
-const PassThrough = require('stream').PassThrough;
-const zlib = require('zlib');
-const mimicResponse = require('mimic-response');
+var PassThrough = require('stream').PassThrough;
+var zlib = require('zlib');
+var mimicResponse = require('mimic-response');
 
 module.exports = response => {
 	// TODO: Use Array#includes when targeting Node.js 6
@@ -9,8 +9,8 @@ module.exports = response => {
 		return response;
 	}
 
-	const unzip = zlib.createUnzip();
-	const stream = new PassThrough();
+	var unzip = zlib.createUnzip();
+	var stream = new PassThrough();
 
 	mimicResponse(response, stream);
 
