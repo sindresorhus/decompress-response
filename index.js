@@ -1,16 +1,16 @@
 'use strict';
-const PassThrough = require('stream').PassThrough;
+const {PassThrough} = require('stream');
 const zlib = require('zlib');
 const mimicResponse = require('mimic-response');
 
 module.exports = response => {
-	// TODO: Use Array#includes when targeting Node.js 6
-	if (['gzip', 'deflate', 'br'].indexOf(response.headers['content-encoding']) === -1) {
+	const contentEncoding = response.headers['content-encoding'];
+
+	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
 		return response;
 	}
 
-	const isBrotli = response.headers['content-encoding'] === 'br';
-
+	const isBrotli = contentEncoding === 'br';
 	if (isBrotli && typeof zlib.createBrotliDecompress !== 'function') {
 		return response;
 	}
@@ -20,14 +20,14 @@ module.exports = response => {
 
 	mimicResponse(response, stream);
 
-	decompress.on('error', err => {
+	decompress.on('error', error => {
 		// Ignore empty response
-		if (err.code === 'Z_BUF_ERROR') {
+		if (error.code === 'Z_BUF_ERROR') {
 			stream.end();
 			return;
 		}
 
-		stream.emit('error', err);
+		stream.emit('error', error);
 	});
 
 	response.pipe(decompress).pipe(stream);

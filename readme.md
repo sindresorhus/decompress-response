@@ -20,7 +20,7 @@ $ npm install decompress-response
 const http = require('http');
 const decompressResponse = require('decompress-response');
 
-http.get('http://sindresorhus.com', response => {
+http.get('https://sindresorhus.com', response => {
 	response = decompressResponse(response);
 });
 ```
