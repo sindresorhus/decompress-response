@@ -1,5 +1,5 @@
 'use strict';
-const {PassThrough} = require('stream');
+const {PassThrough: PassThroughStream} = require('stream');
 const zlib = require('zlib');
 const mimicResponse = require('mimic-response');
 
@@ -16,7 +16,7 @@ module.exports = response => {
 	}
 
 	const decompress = isBrotli ? zlib.createBrotliDecompress() : zlib.createUnzip();
-	const stream = new PassThrough();
+	const stream = new PassThroughStream();
 
 	mimicResponse(response, stream);
 
