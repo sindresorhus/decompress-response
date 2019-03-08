@@ -25,6 +25,17 @@ http.get('https://sindresorhus.com', response => {
 });
 ```
 
+## API
+
+### decompressResponse(response)
+
+Returns the decompressed HTTP response stream.
+
+#### response
+
+Type: `IncomingMessage`
+
+The HTTP incoming stream with compressed data.
 
 ## License
 
