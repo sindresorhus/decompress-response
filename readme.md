@@ -25,6 +25,7 @@ http.get('https://sindresorhus.com', response => {
 });
 ```
 
+
 ## API
 
 ### decompressResponse(response)
@@ -33,9 +34,10 @@ Returns the decompressed HTTP response stream.
 
 #### response
 
-Type: `IncomingMessage`
+Type: [`http.IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
 
 The HTTP incoming stream with compressed data.
+
 
 ## License
 
