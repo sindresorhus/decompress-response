@@ -1,6 +1,6 @@
 {
 	"name": "decompress-response",
-	"version": "4.0.0",
+	"version": "4.1.0",
 	"description": "Decompress a HTTP response if needed",
 	"license": "MIT",
 	"repository": "sindresorhus/decompress-response",
