@@ -36,4 +36,5 @@ const decompressResponse = response => {
 };
 
 module.exports = decompressResponse;
+// TODO: remove this in the next major version
 module.exports.default = decompressResponse;
