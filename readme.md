@@ -39,6 +39,14 @@ Type: [`http.IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_
 The HTTP incoming stream with compressed data.
 
 
-## License
+---
 
-MIT © [Sindre Sorhus](https://sindresorhus.com)
+<div align="center">
+	<b>
+		<a href="https://tidelift.com/subscription/pkg/npm-unzip-response?utm_source=npm-unzip-response&utm_medium=referral&utm_campaign=readme">Get professional support for this package with a Tidelift subscription</a>
+	</b>
+	<br>
+	<sub>
+		Tidelift helps make open source sustainable for maintainers while giving companies<br>assurances about security, maintenance, and licensing for their dependencies.
+	</sub>
+</div>
