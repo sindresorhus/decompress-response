@@ -3,8 +3,9 @@ import zlib from 'zlib';
 import test from 'ava';
 import getStream from 'get-stream';
 import pify from 'pify';
-import decompressResponse from '..';
+
 import {createServer} from './helpers/server';
+import decompressResponse from '..';
 
 const zlibP = pify(zlib);
 const httpGetP = pify(http.get, {errorFirst: false});
@@ -95,7 +96,7 @@ if (typeof zlib.brotliCompress === 'function') {
 	});
 }
 
-test('ignore missing data', async t => {
+test('throw error when missing data', async t => {
 	const response = decompressResponse(await httpGetP(`${s.url}/missing-data`));
 
 	t.is(typeof response.httpVersion, 'string');
@@ -103,7 +104,11 @@ test('ignore missing data', async t => {
 
 	response.setEncoding('utf8');
 
-	t.is(await getStream(response), fixture);
+	const error = await t.throwsAsync(getStream(response));
+
+	t.is(error.bufferedData, fixture);
+	t.is(error.code, 'Z_BUF_ERROR');
+	t.is(error.message, 'unexpected end of file');
 });
 
 test('preserves custom properties on the stream', async t => {

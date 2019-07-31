@@ -21,10 +21,8 @@ const decompressResponse = response => {
 	mimicResponse(response, stream);
 
 	decompress.on('error', error => {
-		// Ignore empty response
 		if (error.code === 'Z_BUF_ERROR') {
 			stream.end();
-			return;
 		}
 
 		stream.emit('error', error);
