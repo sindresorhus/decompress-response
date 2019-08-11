@@ -6,9 +6,12 @@ const mimicResponse = require('mimic-response');
 const decompressResponse = response => {
 	const contentEncoding = response.headers['content-encoding'];
 
-	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
-		return response;
-	}
+  if (
+    !contentEncoding ||
+    !['gzip', 'deflate', 'br'].includes(contentEncoding.toLowerCase())
+  ) {
+    return response;
+  }
 
 	const isBrotli = contentEncoding === 'br';
 	if (isBrotli && typeof zlib.createBrotliDecompress !== 'function') {
