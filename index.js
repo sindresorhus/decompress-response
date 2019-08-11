@@ -4,12 +4,9 @@ const zlib = require('zlib');
 const mimicResponse = require('mimic-response');
 
 const decompressResponse = response => {
-	const contentEncoding = response.headers['content-encoding'];
+	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
 
-        if (
-                !contentEncoding ||
-                !['gzip', 'deflate', 'br'].includes(contentEncoding.toLowerCase())
-        ) {
+        if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
                 return response;
         }
 
