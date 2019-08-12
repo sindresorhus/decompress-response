@@ -3,8 +3,8 @@ import zlib from 'zlib';
 import test from 'ava';
 import getStream from 'get-stream';
 import pify from 'pify';
+import {createServer} from './_server';
 import decompressResponse from '..';
-import {createServer} from './helpers/server';
 
 const zlibP = pify(zlib);
 const httpGetP = pify(http.get, {errorFirst: false});

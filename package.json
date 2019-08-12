@@ -40,8 +40,8 @@
 		"mimic-response": "^2.0.0"
 	},
 	"devDependencies": {
-		"@types/node": "^11.12.2",
-		"ava": "^1.4.1",
+		"@types/node": "^12.7.1",
+		"ava": "^2.2.0",
 		"get-stream": "^5.0.0",
 		"pify": "^4.0.1",
 		"tsd": "^0.7.1",
