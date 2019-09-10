@@ -43,7 +43,7 @@ The HTTP incoming stream with compressed data.
 
 <div align="center">
 	<b>
-		<a href="https://tidelift.com/subscription/pkg/npm-unzip-response?utm_source=npm-unzip-response&utm_medium=referral&utm_campaign=readme">Get professional support for this package with a Tidelift subscription</a>
+		<a href="https://tidelift.com/subscription/pkg/npm-decompress-response?utm_source=npm-decompress-response&utm_medium=referral&utm_campaign=readme">Get professional support for this package with a Tidelift subscription</a>
 	</b>
 	<br>
 	<sub>
