@@ -10,48 +10,48 @@ const zlibP = pify(zlib);
 const httpGetP = pify(http.get, {errorFirst: false});
 const fixture = 'Compressible response content.\n';
 
-let s;
+let server;
 
 test.before('setup', async () => {
-	s = createServer();
+	server = createServer();
 
-	s.on('/', async (request, response) => {
+	server.on('/', async (request, response) => {
 		response.statusCode = 200;
 		response.setHeader('content-type', 'text/plain');
 		response.setHeader('content-encoding', 'gzip');
 		response.end(await zlibP.gzip(fixture));
 	});
 
-	s.on('/deflate', async (request, response) => {
+	server.on('/deflate', async (request, response) => {
 		response.statusCode = 200;
 		response.setHeader('content-encoding-type', 'text/plain');
 		response.setHeader('content-encoding', 'deflate');
 		response.end(await zlibP.deflate(fixture));
 	});
 
-	s.on('/brotli', async (request, response) => {
+	server.on('/brotli', async (request, response) => {
 		response.statusCode = 200;
 		response.setHeader('content-type', 'text/plain');
 		response.setHeader('content-encoding', 'br');
 		response.end(await zlibP.brotliCompress(fixture));
 	});
 
-	s.on('/missing-data', async (request, response) => {
+	server.on('/missing-data', async (request, response) => {
 		response.statusCode = 200;
 		response.setHeader('content-encoding-type', 'text/plain');
 		response.setHeader('content-encoding', 'gzip');
 		response.end((await zlibP.gzip(fixture)).slice(0, -1));
 	});
 
-	await s.listen(s.port);
+	await server.listen(server.port);
 });
 
 test.after('cleanup', async () => {
-	await s.close();
+	await server.close();
 });
 
 test('decompress gzipped content', async t => {
-	const response = decompressResponse(await httpGetP(s.url));
+	const response = decompressResponse(await httpGetP(server.url));
 
 	t.truthy(response.destroy);
 	t.truthy(response.setTimeout);
@@ -72,7 +72,7 @@ test('decompress gzipped content', async t => {
 });
 
 test('decompress deflated content', async t => {
-	const response = decompressResponse(await httpGetP(`${s.url}/deflate`));
+	const response = decompressResponse(await httpGetP(`${server.url}/deflate`));
 
 	t.is(typeof response.httpVersion, 'string');
 	t.truthy(response.headers);
@@ -84,7 +84,7 @@ test('decompress deflated content', async t => {
 
 if (typeof zlib.brotliCompress === 'function') {
 	test('decompress brotli content', async t => {
-		const response = decompressResponse(await httpGetP(`${s.url}/brotli`));
+		const response = decompressResponse(await httpGetP(`${server.url}/brotli`));
 
 		t.is(typeof response.httpVersion, 'string');
 		t.truthy(response.headers);
@@ -96,7 +96,7 @@ if (typeof zlib.brotliCompress === 'function') {
 }
 
 test('ignore missing data', async t => {
-	const response = decompressResponse(await httpGetP(`${s.url}/missing-data`));
+	const response = decompressResponse(await httpGetP(`${server.url}/missing-data`));
 
 	t.is(typeof response.httpVersion, 'string');
 	t.truthy(response.headers);
@@ -107,7 +107,7 @@ test('ignore missing data', async t => {
 });
 
 test('preserves custom properties on the stream', async t => {
-	let response = await httpGetP(s.url);
+	let response = await httpGetP(server.url);
 	response.customProp = '🦄';
 	response = decompressResponse(response);
 

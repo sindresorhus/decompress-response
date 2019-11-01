@@ -10,7 +10,7 @@
 		"url": "sindresorhus.com"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=10"
 	},
 	"scripts": {
 		"test": "xo && ava && tsd"
@@ -44,7 +44,7 @@
 		"ava": "^2.2.0",
 		"get-stream": "^5.0.0",
 		"pify": "^4.0.1",
-		"tsd": "^0.7.1",
-		"xo": "^0.24.0"
+		"tsd": "^0.10.0",
+		"xo": "^0.25.3"
 	}
 }
