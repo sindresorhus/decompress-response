@@ -43,7 +43,7 @@ const decompressResponse = response => {
 	const decompressStream = isBrotli ? zlib.createBrotliDecompress() : zlib.createUnzip();
 
 	decompressStream.once('error', error => {
-		if (isEmpty && response.readableEnded) {
+		if (isEmpty && !response.readable) {
 			finalStream.end();
 			return;
 		}
