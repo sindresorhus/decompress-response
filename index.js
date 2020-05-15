@@ -3,7 +3,7 @@ const {Transform, PassThrough} = require('stream');
 const zlib = require('zlib');
 const mimicResponse = require('mimic-response');
 
-const decompressResponse = response => {
+module.exports = response => {
 	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
 
 	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
@@ -56,5 +56,3 @@ const decompressResponse = response => {
 
 	return finalStream;
 };
-
-module.exports = decompressResponse;

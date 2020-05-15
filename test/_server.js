@@ -5,16 +5,16 @@ export const host = 'localhost';
 export const port = 6765;
 
 export function createServer(givenPort = port) {
-	const s = http.createServer((req, resp) => {
-		s.emit(req.url, req, resp);
+	const server = http.createServer((request, response) => {
+		server.emit(request.url, request, response);
 	});
 
-	s.host = host;
-	s.port = givenPort;
-	s.url = `http://${host}:${givenPort}`;
-	s.protocol = 'http';
-	s.listen = pify(s.listen);
-	s.close = pify(s.close);
+	server.host = host;
+	server.port = givenPort;
+	server.url = `http://${host}:${givenPort}`;
+	server.protocol = 'http';
+	server.listen = pify(server.listen);
+	server.close = pify(server.close);
 
-	return s;
+	return server;
 }
