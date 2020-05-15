@@ -69,6 +69,8 @@ test('decompress gzipped content', async t => {
 	response.setEncoding('utf8');
 
 	t.is(await getStream(response), fixture);
+
+	t.false(response.destroyed);
 });
 
 test('decompress deflated content', async t => {
@@ -95,7 +97,7 @@ if (typeof zlib.brotliCompress === 'function') {
 	});
 }
 
-test('ignore missing data', async t => {
+test('does not ignore missing data', async t => {
 	const response = decompressResponse(await httpGetP(`${server.url}/missing-data`));
 
 	t.is(typeof response.httpVersion, 'string');
@@ -103,7 +105,10 @@ test('ignore missing data', async t => {
 
 	response.setEncoding('utf8');
 
-	t.is(await getStream(response), fixture);
+	await t.throwsAsync(getStream(response), {
+		message: 'unexpected end of file',
+		code: 'Z_BUF_ERROR'
+	});
 });
 
 test('preserves custom properties on the stream', async t => {
