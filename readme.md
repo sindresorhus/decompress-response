@@ -1,4 +1,4 @@
-# decompress-response [![Build Status](https://travis-ci.com/sindresorhus/decompress-response.svg?branch=master)](https://travis-ci.com/sindresorhus/decompress-response)
+# decompress-response
 
 > Decompress a HTTP response if needed
 
