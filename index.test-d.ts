@@ -3,5 +3,5 @@ import {expectType} from 'tsd';
 import decompressResponse = require('.');
 
 http.get('localhost', response => {
-	expectType<http.IncomingMessage>(decompressResponse(response));
+	expectType<decompressResponse.UncompressedIncomingMessage>(decompressResponse(response));
 });
