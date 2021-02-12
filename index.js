@@ -5,6 +5,7 @@ const mimicResponse = require('mimic-response');
 
 module.exports = response => {
 	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
+	delete response.headers['content-encoding'];
 
 	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
 		return response;

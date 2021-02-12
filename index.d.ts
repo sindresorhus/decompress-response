@@ -1,5 +1,15 @@
 /// <reference types="node"/>
-import {IncomingMessage} from 'http';
+import {IncomingMessage, IncomingHttpHeaders} from 'http';
+
+declare namespace decompressResponse {
+	interface UncompressedIncomingHttpHeaders extends IncomingHttpHeaders {
+		'content-encoding'?: never;
+	}
+
+	interface UncompressedIncomingMessage extends IncomingMessage {
+		headers: UncompressedIncomingHttpHeaders;
+	}
+}
 
 /**
 Decompress a HTTP response if needed.
@@ -17,6 +27,6 @@ http.get('https://sindresorhus.com', response => {
 });
 ```
 */
-declare function decompressResponse(response: IncomingMessage): IncomingMessage;
+declare function decompressResponse(response: IncomingMessage): decompressResponse.UncompressedIncomingMessage;
 
 export = decompressResponse;
