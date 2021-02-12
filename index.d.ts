@@ -1,5 +1,4 @@
 /// <reference types="node"/>
-
 import {IncomingMessage, IncomingHttpHeaders} from 'http';
 
 declare namespace decompressResponse {
