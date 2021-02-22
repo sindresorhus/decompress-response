@@ -3,11 +3,13 @@ const {Transform, PassThrough} = require('stream');
 const zlib = require('zlib');
 const mimicResponse = require('mimic-response');
 
+const supportedCompressionAlgorithms = ['gzip', 'deflate', 'br'];
+
 module.exports = response => {
 	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
 	delete response.headers['content-encoding'];
 
-	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
+	if (!supportedCompressionAlgorithms.includes(contentEncoding)) {
 		return response;
 	}
 
@@ -18,17 +20,11 @@ module.exports = response => {
 		return response;
 	}
 
-	let isEmpty = true;
+	let isEmpty = response.readableLength === 0;
 
-	const checker = new Transform({
-		transform(data, _encoding, callback) {
-			isEmpty = false;
-
-			callback(null, data);
-		},
-
-		flush(callback) {
-			callback();
+	response.once('readable', () => {
+		if (response.readableLength === 0) {
+			isEmpty = true;
 		}
 	});
 
@@ -53,7 +49,7 @@ module.exports = response => {
 	});
 
 	mimicResponse(response, finalStream);
-	response.pipe(checker).pipe(decompressStream).pipe(finalStream);
+	response.pipe(decompressStream, finalStream);
 
 	return finalStream;
 };
