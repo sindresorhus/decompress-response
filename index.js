@@ -1,15 +1,15 @@
 'use strict';
-const {Transform, PassThrough} = require('stream');
+const {PassThrough} = require('stream');
 const zlib = require('zlib');
 const mimicResponse = require('mimic-response');
 
-const supportedCompressionAlgorithms = ['gzip', 'deflate', 'br'];
+const supportedCompressionAlgorithms = new Set(['gzip', 'deflate', 'br']);
 
 module.exports = response => {
 	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
 	delete response.headers['content-encoding'];
 
-	if (!supportedCompressionAlgorithms.includes(contentEncoding)) {
+	if (!supportedCompressionAlgorithms.has(contentEncoding)) {
 		return response;
 	}
 
