@@ -43,6 +43,13 @@ test.before('setup', async () => {
 		response.end((await zlibP.gzip(fixture)).slice(0, -1));
 	});
 
+	server.on('/non-compressed', async (request, response) => {
+		response.statusCode = 200;
+		response.setHeader('content-type', 'text/plain');
+		response.setHeader('content-encoding', 'unicorn');
+		response.end(fixture);
+	});
+
 	await server.listen(server.port);
 });
 
@@ -119,4 +126,14 @@ test('preserves custom properties on the stream', async t => {
 	t.is(response.customProp, '🦄');
 
 	response.destroy();
+});
+
+test('passthrough on non-compressed data', async t => {
+	const response = decompressResponse(await httpGetP(`${server.url}/non-compressed`));
+
+	t.is(response.headers['content-encoding'], 'unicorn');
+
+	response.setEncoding('utf8');
+
+	t.is(await getStream(response), fixture);
 });
