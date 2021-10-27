@@ -1,10 +1,10 @@
-import http from 'http';
-import zlib from 'zlib';
+import http from 'node:http';
+import zlib from 'node:zlib';
 import test from 'ava';
 import getStream from 'get-stream';
 import pify from 'pify';
-import {createServer} from './_server';
-import decompressResponse from '..';
+import decompressResponse from '../index.js';
+import {createServer} from './_server.js';
 
 const zlibP = pify(zlib);
 const httpGetP = pify(http.get, {errorFirst: false});
@@ -91,18 +91,16 @@ test('decompress deflated content', async t => {
 	t.is(await getStream(response), fixture);
 });
 
-if (typeof zlib.brotliCompress === 'function') {
-	test('decompress brotli content', async t => {
-		const response = decompressResponse(await httpGetP(`${server.url}/brotli`));
+test('decompress brotli content', async t => {
+	const response = decompressResponse(await httpGetP(`${server.url}/brotli`));
 
-		t.is(typeof response.httpVersion, 'string');
-		t.truthy(response.headers);
+	t.is(typeof response.httpVersion, 'string');
+	t.truthy(response.headers);
 
-		response.setEncoding('utf8');
+	response.setEncoding('utf8');
 
-		t.is(await getStream(response), fixture);
-	});
-}
+	t.is(await getStream(response), fixture);
+});
 
 test('does not ignore missing data', async t => {
 	const response = decompressResponse(await httpGetP(`${server.url}/missing-data`));
@@ -114,7 +112,7 @@ test('does not ignore missing data', async t => {
 
 	await t.throwsAsync(getStream(response), {
 		message: 'unexpected end of file',
-		code: 'Z_BUF_ERROR'
+		code: 'Z_BUF_ERROR',
 	});
 });
 

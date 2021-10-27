@@ -1,4 +1,4 @@
-import http from 'http';
+import http from 'node:http';
 import pify from 'pify';
 
 export const host = 'localhost';

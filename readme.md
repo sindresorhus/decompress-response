@@ -8,15 +8,15 @@ Used by [`got`](https://github.com/sindresorhus/got).
 
 ## Install
 
-```
-$ npm install decompress-response
+```sh
+npm install decompress-response
 ```
 
 ## Usage
 
 ```js
-const http = require('http');
-const decompressResponse = require('decompress-response');
+import http from 'node:http';
+import decompressResponse from 'decompress-response';
 
 http.get('https://sindresorhus.com', response => {
 	response = decompressResponse(response);

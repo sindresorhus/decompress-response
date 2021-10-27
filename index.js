@@ -1,9 +1,8 @@
-'use strict';
-const {Transform, PassThrough} = require('stream');
-const zlib = require('zlib');
-const mimicResponse = require('mimic-response');
+import {Transform as TransformStream, PassThrough as PassThroughStream} from 'node:stream';
+import zlib from 'node:zlib';
+import mimicResponse from 'mimic-response';
 
-module.exports = response => {
+export default function decompressResponse(response) {
 	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
 
 	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
@@ -12,16 +11,9 @@ module.exports = response => {
 
 	delete response.headers['content-encoding'];
 
-	// TODO: Remove this when targeting Node.js 12.
-	const isBrotli = contentEncoding === 'br';
-	if (isBrotli && typeof zlib.createBrotliDecompress !== 'function') {
-		response.destroy(new Error('Brotli is not supported on Node.js < 12'));
-		return response;
-	}
-
 	let isEmpty = true;
 
-	const checker = new Transform({
+	const checker = new TransformStream({
 		transform(data, _encoding, callback) {
 			isEmpty = false;
 
@@ -30,19 +22,19 @@ module.exports = response => {
 
 		flush(callback) {
 			callback();
-		}
+		},
 	});
 
-	const finalStream = new PassThrough({
+	const finalStream = new PassThroughStream({
 		autoDestroy: false,
 		destroy(error, callback) {
 			response.destroy();
 
 			callback(error);
-		}
+		},
 	});
 
-	const decompressStream = isBrotli ? zlib.createBrotliDecompress() : zlib.createUnzip();
+	const decompressStream = contentEncoding === 'br' ? zlib.createBrotliDecompress() : zlib.createUnzip();
 
 	decompressStream.once('error', error => {
 		if (isEmpty && !response.readable) {
@@ -57,4 +49,4 @@ module.exports = response => {
 	response.pipe(checker).pipe(decompressStream).pipe(finalStream);
 
 	return finalStream;
-};
+}

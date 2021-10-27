@@ -1,14 +1,11 @@
-/// <reference types="node"/>
-import {IncomingMessage, IncomingHttpHeaders} from 'http';
+import {IncomingMessage, IncomingHttpHeaders} from 'node:http';
 
-declare namespace decompressResponse {
-	interface UncompressedIncomingHttpHeaders extends IncomingHttpHeaders {
-		'content-encoding'?: never;
-	}
+export interface UncompressedIncomingHttpHeaders extends IncomingHttpHeaders {
+	'content-encoding'?: never;
+}
 
-	interface UncompressedIncomingMessage extends IncomingMessage {
-		headers: UncompressedIncomingHttpHeaders;
-	}
+export interface UncompressedIncomingMessage extends IncomingMessage {
+	headers: UncompressedIncomingHttpHeaders;
 }
 
 /**
@@ -19,14 +16,12 @@ Decompress a HTTP response if needed.
 
 @example
 ```
-import {http} from 'http';
-import decompressResponse = require('decompress-response');
+import http from 'node:http';
+import decompressResponse from 'decompress-response';
 
 http.get('https://sindresorhus.com', response => {
 	response = decompressResponse(response);
 });
 ```
 */
-declare function decompressResponse(response: IncomingMessage): decompressResponse.UncompressedIncomingMessage;
-
-export = decompressResponse;
+export default function decompressResponse(response: IncomingMessage): UncompressedIncomingMessage;
