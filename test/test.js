@@ -29,6 +29,13 @@ test.before('setup', async () => {
 		response.end(await zlibP.deflate(fixture));
 	});
 
+	server.on('/deflateRaw', async (request, response) => {
+		response.statusCode = 200;
+		response.setHeader('content-encoding-type', 'text/plain');
+		response.setHeader('content-encoding', 'deflate');
+		response.end(await zlibP.deflateRaw(fixture));
+	});
+
 	server.on('/brotli', async (request, response) => {
 		response.statusCode = 200;
 		response.setHeader('content-type', 'text/plain');
@@ -82,6 +89,17 @@ test('decompress gzipped content', async t => {
 
 test('decompress deflated content', async t => {
 	const response = decompressResponse(await httpGetP(`${server.url}/deflate`));
+
+	t.is(typeof response.httpVersion, 'string');
+	t.truthy(response.headers);
+
+	response.setEncoding('utf8');
+
+	t.is(await getStream(response), fixture);
+});
+
+test('decompress raw-deflated content', async t => {
+	const response = decompressResponse(await httpGetP(`${server.url}/deflateRaw`));
 
 	t.is(typeof response.httpVersion, 'string');
 	t.truthy(response.headers);
