@@ -13,9 +13,35 @@ export default function decompressResponse(response) {
 
 	let isEmpty = true;
 
+	function handleContentEncoding(data) {
+		const decompressStream = contentEncoding === 'br'
+			? zlib.createBrotliDecompress()
+			: ((contentEncoding === 'deflate' && data.length > 0 && (data[0] & 0x08) === 0) // eslint-disable-line no-bitwise
+				? zlib.createInflateRaw()
+				: zlib.createUnzip());
+
+		decompressStream.once('error', error => {
+			if (isEmpty && !response.readable) {
+				finalStream.end();
+				return;
+			}
+
+			finalStream.destroy(error);
+		});
+
+		checker.pipe(decompressStream).pipe(finalStream);
+	}
+
 	const checker = new TransformStream({
 		transform(data, _encoding, callback) {
+			if (isEmpty === false) {
+				callback(null, data);
+				return;
+			}
+
 			isEmpty = false;
+
+			handleContentEncoding(data);
 
 			callback(null, data);
 		},
@@ -34,19 +60,8 @@ export default function decompressResponse(response) {
 		},
 	});
 
-	const decompressStream = contentEncoding === 'br' ? zlib.createBrotliDecompress() : zlib.createUnzip();
-
-	decompressStream.once('error', error => {
-		if (isEmpty && !response.readable) {
-			finalStream.end();
-			return;
-		}
-
-		finalStream.destroy(error);
-	});
-
 	mimicResponse(response, finalStream);
-	response.pipe(checker).pipe(decompressStream).pipe(finalStream);
+	response.pipe(checker);
 
 	return finalStream;
 }
