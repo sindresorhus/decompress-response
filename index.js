@@ -9,9 +9,11 @@ export default function decompressResponse(response) {
 		return response;
 	}
 
-	delete response.headers['content-encoding'];
-
 	let isEmpty = true;
+	let finalStream = new PassThroughStream();
+
+	// Clone headers to avoid modifying the original response headers
+	const headers = {...response.headers};
 
 	function handleContentEncoding(data) {
 		const decompressStream = contentEncoding === 'br'
@@ -51,7 +53,7 @@ export default function decompressResponse(response) {
 		},
 	});
 
-	const finalStream = new PassThroughStream({
+	finalStream = new PassThroughStream({
 		autoDestroy: false,
 		destroy(error, callback) {
 			response.destroy();
@@ -59,6 +61,10 @@ export default function decompressResponse(response) {
 			callback(error);
 		},
 	});
+
+	delete headers['content-encoding'];
+	delete headers['content-length'];
+	finalStream.headers = headers;
 
 	mimicResponse(response, finalStream);
 	response.pipe(checker);

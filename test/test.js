@@ -153,3 +153,17 @@ test('passthrough on non-compressed data', async t => {
 
 	t.is(await getStream(response), fixture);
 });
+
+test('original response retains content-encoding and content-length headers', async t => {
+	const originalResponse = await httpGetP(server.url);
+	const decompressedResponse = decompressResponse(originalResponse);
+
+	t.is(originalResponse.headers['content-encoding'], 'gzip');
+	t.truthy(originalResponse.headers['content-length']);
+	t.is(decompressedResponse.headers['content-encoding'], undefined);
+	t.is(decompressedResponse.headers['content-length'], undefined);
+
+	decompressedResponse.setEncoding('utf8');
+
+	t.is(await getStream(decompressedResponse), fixture);
+});
