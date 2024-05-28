@@ -1,12 +1,12 @@
-import {IncomingMessage, IncomingHttpHeaders} from 'node:http';
+import {type IncomingMessage, type IncomingHttpHeaders} from 'node:http';
 
-export interface UncompressedIncomingHttpHeaders extends IncomingHttpHeaders {
+export type UncompressedIncomingHttpHeaders = {
 	'content-encoding'?: never;
-}
+} & IncomingHttpHeaders;
 
-export interface UncompressedIncomingMessage extends IncomingMessage {
+export type UncompressedIncomingMessage = {
 	headers: UncompressedIncomingHttpHeaders;
-}
+} & IncomingMessage;
 
 /**
 Decompress a HTTP response if needed.

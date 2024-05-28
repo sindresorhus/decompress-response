@@ -24,14 +24,14 @@ test.before('setup', async () => {
 
 	server.on('/deflate', async (request, response) => {
 		response.statusCode = 200;
-		response.setHeader('content-encoding-type', 'text/plain');
+		response.setHeader('content-type', 'text/plain');
 		response.setHeader('content-encoding', 'deflate');
 		response.end(await zlibP.deflate(fixture));
 	});
 
 	server.on('/deflateRaw', async (request, response) => {
 		response.statusCode = 200;
-		response.setHeader('content-encoding-type', 'text/plain');
+		response.setHeader('content-type', 'text/plain');
 		response.setHeader('content-encoding', 'deflate');
 		response.end(await zlibP.deflateRaw(fixture));
 	});
@@ -45,9 +45,10 @@ test.before('setup', async () => {
 
 	server.on('/missing-data', async (request, response) => {
 		response.statusCode = 200;
-		response.setHeader('content-encoding-type', 'text/plain');
+		response.setHeader('content-type', 'text/plain');
 		response.setHeader('content-encoding', 'gzip');
-		response.end((await zlibP.gzip(fixture)).slice(0, -1));
+		const gzipped = await zlibP.gzip(fixture);
+		response.end(gzipped.slice(0, -1));
 	});
 
 	server.on('/non-compressed', async (request, response) => {
