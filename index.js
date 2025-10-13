@@ -62,6 +62,10 @@ export default function decompressResponse(response) {
 		},
 
 		flush(callback) {
+			if (isEmpty) {
+				finalStream.end();
+			}
+
 			callback();
 		},
 	});
