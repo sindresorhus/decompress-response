@@ -2,10 +2,17 @@ import {Transform as TransformStream, PassThrough as PassThroughStream} from 'no
 import zlib from 'node:zlib';
 import mimicResponse from 'mimic-response';
 
+// Detect zstd support (available in Node.js >= 22.15.0)
+const supportsZstd = typeof zlib.createZstdDecompress === 'function';
+
 export default function decompressResponse(response) {
 	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
+	const supportedEncodings = ['gzip', 'deflate', 'br'];
+	if (supportsZstd) {
+		supportedEncodings.push('zstd');
+	}
 
-	if (!['gzip', 'deflate', 'br'].includes(contentEncoding)) {
+	if (!supportedEncodings.includes(contentEncoding)) {
 		return response;
 	}
 
@@ -16,11 +23,17 @@ export default function decompressResponse(response) {
 	const headers = {...response.headers};
 
 	function handleContentEncoding(data) {
-		const decompressStream = contentEncoding === 'br'
-			? zlib.createBrotliDecompress()
-			: ((contentEncoding === 'deflate' && data.length > 0 && (data[0] & 0x08) === 0) // eslint-disable-line no-bitwise
-				? zlib.createInflateRaw()
-				: zlib.createUnzip());
+		let decompressStream;
+
+		if (contentEncoding === 'zstd') {
+			decompressStream = zlib.createZstdDecompress();
+		} else if (contentEncoding === 'br') {
+			decompressStream = zlib.createBrotliDecompress();
+		} else if (contentEncoding === 'deflate' && data.length > 0 && (data[0] & 0x08) === 0) { // eslint-disable-line no-bitwise
+			decompressStream = zlib.createInflateRaw();
+		} else {
+			decompressStream = zlib.createUnzip();
+		}
 
 		decompressStream.once('error', error => {
 			if (isEmpty && !response.readable) {

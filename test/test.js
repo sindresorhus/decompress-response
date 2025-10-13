@@ -9,6 +9,7 @@ import {createServer} from './_server.js';
 const zlibP = pify(zlib);
 const httpGetP = pify(http.get, {errorFirst: false});
 const fixture = 'Compressible response content.\n';
+const supportsZstd = typeof zlib.zstdCompress === 'function';
 
 let server;
 
@@ -42,6 +43,15 @@ test.before('setup', async () => {
 		response.setHeader('content-encoding', 'br');
 		response.end(await zlibP.brotliCompress(fixture));
 	});
+
+	if (supportsZstd) {
+		server.on('/zstd', async (request, response) => {
+			response.statusCode = 200;
+			response.setHeader('content-type', 'text/plain');
+			response.setHeader('content-encoding', 'zstd');
+			response.end(await zlibP.zstdCompress(fixture));
+		});
+	}
 
 	server.on('/missing-data', async (request, response) => {
 		response.statusCode = 200;
@@ -120,6 +130,19 @@ test('decompress brotli content', async t => {
 
 	t.is(await getStream(response), fixture);
 });
+
+if (supportsZstd) {
+	test('decompress zstd content', async t => {
+		const response = decompressResponse(await httpGetP(`${server.url}/zstd`));
+
+		t.is(typeof response.httpVersion, 'string');
+		t.truthy(response.headers);
+
+		response.setEncoding('utf8');
+
+		t.is(await getStream(response), fixture);
+	});
+}
 
 test('does not ignore missing data', async t => {
 	const response = decompressResponse(await httpGetP(`${server.url}/missing-data`));

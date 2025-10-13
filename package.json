@@ -41,7 +41,9 @@
 		"message",
 		"stream",
 		"compressed",
-		"brotli"
+		"brotli",
+		"zstd",
+		"zstandard"
 	],
 	"dependencies": {
 		"mimic-response": "^4.0.0"
