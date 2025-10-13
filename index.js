@@ -17,10 +17,18 @@ export default function decompressResponse(response) {
 	}
 
 	let isEmpty = true;
-	let finalStream = new PassThroughStream();
 
 	// Clone headers to avoid modifying the original response headers
 	const headers = {...response.headers};
+
+	const finalStream = new PassThroughStream({
+		autoDestroy: false,
+	});
+
+	// Only destroy response on error, not on normal completion
+	finalStream.once('error', () => {
+		response.destroy();
+	});
 
 	function handleContentEncoding(data) {
 		let decompressStream;
@@ -70,20 +78,12 @@ export default function decompressResponse(response) {
 		},
 	});
 
-	finalStream = new PassThroughStream({
-		autoDestroy: false,
-		destroy(error, callback) {
-			response.destroy();
-
-			callback(error);
-		},
-	});
-
 	delete headers['content-encoding'];
 	delete headers['content-length'];
 	finalStream.headers = headers;
 
 	mimicResponse(response, finalStream);
+
 	response.pipe(checker);
 
 	return finalStream;

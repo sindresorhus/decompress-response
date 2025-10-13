@@ -191,3 +191,28 @@ test('original response retains content-encoding and content-length headers', as
 
 	t.is(await getStream(decompressedResponse), fixture);
 });
+
+test('manual destroy does not destroy underlying response', async t => {
+	const originalResponse = await httpGetP(server.url);
+	const decompressedResponse = decompressResponse(originalResponse);
+
+	// Manual destroy (with or without error) does not destroy the underlying response
+	// Only stream processing errors trigger response destruction
+	decompressedResponse.destroy();
+
+	t.true(decompressedResponse.destroyed);
+	t.false(originalResponse.destroyed);
+});
+
+test('stream processing errors destroy underlying response', async t => {
+	const originalResponse = await httpGetP(`${server.url}/missing-data`);
+	const decompressedResponse = decompressResponse(originalResponse);
+
+	decompressedResponse.setEncoding('utf8');
+
+	// This will cause a decompression error, which should destroy the response
+	await t.throwsAsync(getStream(decompressedResponse));
+
+	t.true(decompressedResponse.destroyed);
+	t.true(originalResponse.destroyed);
+});
